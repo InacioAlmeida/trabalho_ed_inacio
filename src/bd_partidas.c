@@ -64,6 +64,7 @@ int carregar_bd_partidas(BDPartidas* bdp, const char* filename) {
 
     fclose(f);
     return 0;
+}
 
 Partida** get_todas_partidas_bd(BDPartidas* bdp, int* count) {
     *count = bdp->count;
