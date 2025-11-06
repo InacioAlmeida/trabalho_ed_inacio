@@ -1,8 +1,9 @@
+#include "time.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "time.h"
 
+// Estrutura interna e privada do TAD Time.
 struct time
 {
     int id;
@@ -18,12 +19,14 @@ Time* criar_time(int id, const char* nome){
     Time* t = malloc(sizeof(struct time));
 
     if (t == NULL){
-        printf("Erro ao alocar memmória dinamicamente para o ponteiro time");
+        printf("Erro ao alocar memmória dinamicamente para o ponteiro time\n");
         return NULL;
     }
 
     t->id = id;
     strcpy(t->nome, nome);
+    
+    // Inicializa estatísticas zeradas
     t->V = 0;
     t->E = 0;
     t->D = 0;
@@ -34,12 +37,13 @@ Time* criar_time(int id, const char* nome){
 }
 
 void atualizar_estatisticas_time(Time* t, int gols_marcados, int gols_sofridos){
+    // Acumula os gols da partida
     t->GM += gols_marcados;
     t->GS += gols_sofridos;
 
+    // Incrementa a estatística de resultado (V, E ou D)
     if (gols_marcados > gols_sofridos){
         t->V++;
-
     } else if (gols_marcados < gols_sofridos){
         t->D++;
     } else{
@@ -51,8 +55,7 @@ void deletar_time(Time* t){
     free(t);
 }
 
-//Implementando getters
-
+// --- Implementação dos Getters ---
 
 const char* time_get_nome(Time* t) {
     return t->nome;
@@ -69,9 +72,13 @@ int time_get_derrotas(Time* t){
 int time_get_empates(Time* t){
     return t->E;
 }
+
+// Retorna pontuação calculada
 int time_get_pontuacao(Time* t){
     return (t->V * 3) + t-> E;
 }
+
+// Retorna saldo de gols calculado
 int time_get_saldoGols(Time* t){
     return (t->GM - t->GS);
 }

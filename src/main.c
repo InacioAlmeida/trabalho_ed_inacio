@@ -1,3 +1,13 @@
+/*
+ * Ponto de entrada principal do programa.
+ * Responsável por orquestrar o sistema:
+ * 1. Inicializa os TADs
+ * 2. Carrega os dados dos arquivos CSV
+ * 3. Processa as estatísticas
+ * 4. Exibe o menu de UI
+ * 5. Libera a memória ao sair
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +21,7 @@
 #include "bd_partidas.h"
 #include "campeonato.h"
 
-// --- Protótipos das Funções Auxiliares ---
+// --- Protótipos das Funções Auxiliares (privadas ao main) ---
 
 void limpar_tela();
 void pausar_tela();
@@ -20,14 +30,14 @@ void imprimir_menu_principal();
 void imprimir_cabecalho_tabela();
 
 // Funções para cada opção do menu
-void handle_consultar_time(BDTimes* bdt);
+void executar_consulta_time(BDTimes* bdt);
 void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp);
 void handle_imprimir_tabela(BDTimes* bdt);
 
 // --- Função Principal ---
 
 int main() {
-    // 1. Inicialização
+    // 1. Inicialização (Cria os gerenciadores)
     BDTimes* bdt = criar_bd_times();
     BDPartidas* bdp = criar_bd_partidas();
 
@@ -36,18 +46,22 @@ int main() {
         return 1;
     }
 
-    // 2. Carga
+    // 2. Carga (Lê os arquivos CSV)
     if (carregar_bd_times(bdt, "dados/times.csv") != 0) {
         printf("Erro ao carregar times.csv. Verifique se o arquivo existe.\n");
         return 1;
     }
-    if (carregar_bd_partidas(bdp, "dados/partidas_vazio.csv") != 0) {
+    // NOTA: Mude o arquivo aqui para testar os 3 cenários
+    // "dados/partidas_vazio.csv"
+    // "dados/partidas_parcial.csv"
+    // "dados/partidas_completo.csv"
+    if (carregar_bd_partidas(bdp, "dados/partidas_completo.csv") != 0) {
         printf("Erro ao carregar partidas.csv. Verifique se o arquivo existe.\n");
         return 1;
     }
 
     // 3. Processamento
-    // Calcula Vitórias, Empates, Derrotas, Gols Marcos, Gols sofridos de todos os times
+    // Calcula Vitórias, Empates, Derrotas, Gols Marcados, Gols Sofridos
     campeonato_calcular_estatisticas(bdt, bdp);
 
     // 4. Loop Principal (UI)
@@ -59,7 +73,7 @@ int main() {
 
         switch (opcao) {
             case '1':
-                handle_consultar_time(bdt);
+                executar_consulta_time(bdt);
                 pausar_tela();
                 break;
             case '2':
@@ -88,15 +102,16 @@ int main() {
     } while (opcao != 'Q');
 
 
-    // 5. Limpeza (Destroy)
-    destruir_bd_times(bdt);
-    destruir_bd_partidas(bdp);
+    // 5. Limpeza 
+    // Libera toda a memória alocada pelo programa
+    deletar_bd_times(bdt);
+    deletar_bd_partidas(bdp);
 
     return 0;
 }
 
-//1° opção do menu: Consulta time por prefixo.
-void handle_consultar_time(BDTimes* bdt) {
+// (1° Opção do menu) Lida com a consulta de time por prefixo.
+void executar_consulta_time(BDTimes* bdt) {
     char prefixo[100];
     printf("\n--- Consultar Time ---\n");
     printf("Digite o nome ou prefixo do time: ");
@@ -108,11 +123,12 @@ void handle_consultar_time(BDTimes* bdt) {
     prefixo[strcspn(prefixo, "\n")] = 0;
 
     int num_encontrados = 0;
+    // get_times_bd_por_prefixo aloca um novo vetor
     Time** encontrados = get_times_bd_por_prefixo(bdt, prefixo, &num_encontrados);
 
     if (num_encontrados == 0) {
         printf("Nenhum time encontrado com o prefixo '%s'.\n", prefixo);
-        free(encontrados);
+        free(encontrados); // Libera o vetor mesmo se estiver vazio
         return;
     }
 
@@ -130,10 +146,11 @@ void handle_consultar_time(BDTimes* bdt) {
                time_get_saldoGols(t),
                time_get_pontuacao(t));
     }
+    // Libera a memória alocada por get_times_bd_por_prefixo
     free(encontrados);
 }
 
-//Opção 2: Consulta partidas por time.
+// (2° opção do menu) Lida com a consulta de partidas por time.
 void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
     printf("\n--- Consultar Partidas ---\n");
     printf("1 - Por time mandante\n");
@@ -155,10 +172,11 @@ void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
     if (fgets(prefixo, sizeof(prefixo), stdin) == NULL) {
         return; // Trata erro ou EOF
     }
-    // Remove o '\n' que o fgets deixa no final
-    prefixo[strcspn(prefixo, "\n")] = 0;
+    prefixo[strcspn(prefixo, "\n")] = 0; // Remove o '\n'
 
-    // 1. Achar os times que correspondem ao prefixo
+    // Lógica da consulta em 3 etapas:
+
+    // 1. Achar os times (e seus IDs) que correspondem ao prefixo
     int num_times_filtro = 0;
     Time** times_filtro = get_times_bd_por_prefixo(bdt, prefixo, &num_times_filtro);
 
@@ -172,7 +190,7 @@ void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
     int num_partidas_total = 0;
     Partida** todas_partidas = get_todas_partidas_bd(bdp, &num_partidas_total);
 
-    // 3. Iterar e filtrar
+    // 3. Iterar sobre todas as partidas e filtrar
     int partidas_encontradas_count = 0;
     printf("\nPartidas encontradas:\n");
     printf("ID  Time1        x   Time2\n");
@@ -183,15 +201,17 @@ void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
         int id_time1 = partida_get_id_time1(p);
         int id_time2 = partida_get_id_time2(p);
 
-        bool partida_time1 = false;
-        bool partida_time2 = false;
+        bool partida_time1 = false; // O time do filtro é o mandante?
+        bool partida_time2 = false; // O time do filtro é o visitante?
 
+        // Verifica se o ID da partida bate com algum ID da lista do filtro
         for (int j = 0; j < num_times_filtro; j++) {
             int id_filtro = time_get_id(times_filtro[j]);
             if (id_time1 == id_filtro) partida_time1 = true;
             if (id_time2 == id_filtro) partida_time2 = true;
         }
 
+        // Aplica a regra da sub-opção (1, 2 ou 3)
         bool imprimir = false;
         if (sub_opcao == '1' && partida_time1) imprimir = true;
         if (sub_opcao == '2' && partida_time2) imprimir = true;
@@ -214,10 +234,11 @@ void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
         printf("Nenhuma partida encontrada para os critérios.\n");
     }
 
+    // Libera a lista de times alocada por get_times_bd_por_prefixo
     free(times_filtro);
 }
 
-// 6° opção do menu: Imprime a tabela de classificação
+/* (6° opção do menu) Imprime a tabela de classificação completa, ordenada por ID. */
 void handle_imprimir_tabela(BDTimes* bdt) {
     int num_times = 0;
     Time** todos_times = get_todos_times_bd(bdt, &num_times);
@@ -230,9 +251,8 @@ void handle_imprimir_tabela(BDTimes* bdt) {
     printf("\n--- Tabela de Classificação (Por ID) ---\n");
     imprimir_cabecalho_tabela();
     
+    // Conforme requisito do PDF, os times serão impressos por ID 
     for (int i = 0; i < num_times; i++) {
-        // Como carregamos os times usando o ID como índice,
-        // o vetor todos_times[i] já está na ordem de ID 0, 1, 2...
         Time* t = todos_times[i];
         
         printf("%-3d %-10s %-3d %-3d %-3d %-3d %-3d %-3d %-3d\n",
@@ -265,34 +285,35 @@ void imprimir_menu_principal() {
     printf("Escolha uma opção: ");
 }
 
+// Imprime o cabeçalho padrão para as tabelas (Opção 1 e 6)
 void imprimir_cabecalho_tabela() {
-    // Cabeçalho para Opção 1 e 6
     printf("------------------------------------------------------------------\n");
     printf("%-3s %-10s %-3s %-3s %-3s %-3s %-3s %-3s %-3s\n",
            "ID", "Time", "V", "E", "D", "GM", "GS", "S", "PG");
     printf("------------------------------------------------------------------\n");
 }
 
+// Lê a opção do usuário (apenas o primeiro caractere) de forma segura.
 char ler_opcao() {
     char buffer[10];
-    // Usei fgets por ser mais seguro e porque estava gerando erros (descobri isso com GPT e em foruns)
+    // Usei fgets por ser mais seguro (evita lixo no buffer)
     if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-        // Pega o primeiro caractere e o converte para maiúsculo (similar ao .upper() do py)
+        // Pega o primeiro caractere e o converte para maiúsculo
         return toupper(buffer[0]);
     }
     return '\0'; // Retorna nulo em caso de erro
 }
 
+// Limpa a tela do console (só funciona em linux, melhor SO, btw)
 void limpar_tela() {
-    // Limpar console (tambem uso o ubuntu professor xD, I <3 Tux)
+    // I <3 Tux
     system("clear"); 
 }
 
+// Pausa a execução e espera o usuário pressionar Enter.
 void pausar_tela() {
     printf("\nPressione Enter para continuar...");
-    // Limpa o buffer de entrada
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-    // Espera pelo Enter
-    getchar();
+    getchar(); // Apenas espera por uma tecla
+
+
 }

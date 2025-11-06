@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "partida.h"
 
+// Estrutura interna e privada do TAD Partida.
 struct partida
 {
     int id;
@@ -15,7 +16,7 @@ Partida* criar_partida(int id, int id_time1, int id_time2, int gols_time1, int g
     Partida *p = malloc(sizeof(struct partida));
 
     if (p == NULL){
-        printf("Erro de alocação de memória da partida");
+        printf("Erro de alocação de memória da partida\n");
         return NULL;
     }
 
@@ -32,7 +33,8 @@ void deletar_partida(Partida* p){
     free(p);
 }
 
-//Implementando os getters
+// --- Implementação dos Getters ---
+
 int partida_get_id(Partida* p){
     return p->id;
 }

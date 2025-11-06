@@ -99,7 +99,7 @@ O sistema é dividido em Módulos e Tipos Abstratos de Dados (TADs), onde a impl
 * **Funções Notáveis:**
     * `criar_bd_partidas()`: Aloca o gerenciador e seu vetor estático interno.
     * `carregar_bd_partidas()`: Abre e lê o arquivo `.csv`, usando `criar_partida()` para cada linha.
-    * `destruir_bd_partidas()`: Libera o gerenciador e *todas* as partidas que ele carregou.
+    * `deletar_bd_partidas()`: Libera o gerenciador e *todas* as partidas que ele carregou.
     * `get_todas_partidas_bd()`: Retorna o vetor com todas as partidas.
 
 ### `bd_times.c` / `bd_times.h` (TAD BDTimes)
@@ -108,7 +108,7 @@ O sistema é dividido em Módulos e Tipos Abstratos de Dados (TADs), onde a impl
 * **Funções Notáveis:**
     * `criar_bd_times()`: Aloca o gerenciador e seu vetor interno.
     * `carregar_bd_times()`: Abre e lê o arquivo `.csv`, usando `criar_time()` para cada linha.
-    * `destruir_bd_times()`: Libera o gerenciador e *todos* os times que ele carregou.
+    * `deletar_bd_times()`: Libera o gerenciador e *todos* os times que ele carregou.
     * `get_time_bd_por_id()`: Acesso rápido a um time pelo seu ID (usado no cálculo).
     * `get_times_bd_por_prefixo()`: Lógica de busca. Retorna um *novo* vetor alocado dinamicamente com os times que correspondem ao prefixo.
 
@@ -123,7 +123,7 @@ O sistema é dividido em Módulos e Tipos Abstratos de Dados (TADs), onde a impl
 * **Propósito:** Ponto de entrada. Controla o fluxo do programa, o menu e a interface do usuário.
 * **Funções Notáveis:**
     * `main()`: Orquestra a inicialização, carga, processamento, loop do menu e limpeza final.
-    * `handle_consultar_time()`: Implementa a funcionalidade da Opção 1.
+    * `executar_consulta_time()`: Implementa a funcionalidade da Opção 1.
     * `handle_consultar_partidas()`: Implementa a funcionalidade da Opção 2.
     * `handle_imprimir_tabela()`: Implementa a funcionalidade da Opção 6.
     * `limpar_tela()`, `pausar_tela()`, `ler_opcao()`: Funções utilitárias para a interface de usuário no terminal.
