@@ -1,0 +1,8 @@
+#Ignorar arquivos gerados da compilação de objetos
+*.o
+
+#Ignorar o executavel gerado
+campeonato
+
+#Ignorar arquivo de configuração do VsCode
+.vscode/
