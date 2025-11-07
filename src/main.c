@@ -115,7 +115,7 @@ int main() {
 void executar_consulta_time(BDTimes* bdt) {
     char prefixo[100];
     limpar_tela();
-    printf("\n--- Consultar Time ---\n");
+    printf("--- Consultar Time ---\n");
     printf("Digite o nome ou prefixo do time: ");
     
     if (fgets(prefixo, sizeof(prefixo), stdin) == NULL) {
@@ -155,7 +155,7 @@ void executar_consulta_time(BDTimes* bdt) {
 // (2° opção do menu) Lida com a consulta de partidas por time.
 void executar_consulta_partidas(BDTimes* bdt, BDPartidas* bdp) {
     limpar_tela();
-    printf("\n--- Consultar Partidas ---\n");
+    printf("--- Consultar Partidas ---\n");
     printf("1 - Por time mandante\n");
     printf("2 - Por time visitante\n");
     printf("3 - Por time mandante ou visitante\n");
@@ -252,7 +252,7 @@ void imprimir_tabela_classificacao(BDTimes* bdt) {
         return;
     }
 
-    printf("\n--- Tabela de Classificação (Por ID) ---\n");
+    printf("--- Tabela de Classificação (Por ID) ---\n");
     imprimir_cabecalho_tabela();
     
     // Conforme requisito do PDF, os times serão impressos por ID 
@@ -318,6 +318,4 @@ void limpar_tela() {
 void pausar_tela() {
     printf("\nPressione Enter para continuar...");
     getchar(); // Apenas espera por uma tecla
-
-
 }
