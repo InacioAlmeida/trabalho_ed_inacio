@@ -124,8 +124,8 @@ O sistema é dividido em Módulos e Tipos Abstratos de Dados (TADs), onde a impl
 * **Funções Notáveis:**
     * `main()`: Orquestra a inicialização, carga, processamento, loop do menu e limpeza final.
     * `executar_consulta_time()`: Implementa a funcionalidade da Opção 1.
-    * `handle_consultar_partidas()`: Implementa a funcionalidade da Opção 2.
-    * `handle_imprimir_tabela()`: Implementa a funcionalidade da Opção 6.
+    * `executar_consulta_partidas()`: Implementa a funcionalidade da Opção 2.
+    * `imprimir_tabela_classificacao()`: Implementa a funcionalidade da Opção 6.
     * `limpar_tela()`, `pausar_tela()`, `ler_opcao()`: Funções utilitárias para a interface de usuário no terminal.
 
 ## ⚠️ Limitações (Parte I)

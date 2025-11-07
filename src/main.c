@@ -31,8 +31,8 @@ void imprimir_cabecalho_tabela();
 
 // Funções para cada opção do menu
 void executar_consulta_time(BDTimes* bdt);
-void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp);
-void handle_imprimir_tabela(BDTimes* bdt);
+void executar_consulta_partidas(BDTimes* bdt, BDPartidas* bdp);
+void imprimir_tabela_classificacao(BDTimes* bdt);
 
 // --- Função Principal ---
 
@@ -70,6 +70,7 @@ int main() {
         limpar_tela();
         imprimir_menu_principal();
         opcao = ler_opcao();
+        limpar_tela();
 
         switch (opcao) {
             case '1':
@@ -77,7 +78,7 @@ int main() {
                 pausar_tela();
                 break;
             case '2':
-                handle_consultar_partidas(bdt, bdp);
+                executar_consulta_partidas(bdt, bdp);
                 pausar_tela();
                 break;
             case '3':
@@ -87,7 +88,7 @@ int main() {
                 pausar_tela();
                 break;
             case '6':
-                handle_imprimir_tabela(bdt);
+                imprimir_tabela_classificacao(bdt);
                 pausar_tela();
                 break;
             case 'Q':
@@ -113,6 +114,7 @@ int main() {
 // (1° Opção do menu) Lida com a consulta de time por prefixo.
 void executar_consulta_time(BDTimes* bdt) {
     char prefixo[100];
+    limpar_tela();
     printf("\n--- Consultar Time ---\n");
     printf("Digite o nome ou prefixo do time: ");
     
@@ -151,7 +153,8 @@ void executar_consulta_time(BDTimes* bdt) {
 }
 
 // (2° opção do menu) Lida com a consulta de partidas por time.
-void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
+void executar_consulta_partidas(BDTimes* bdt, BDPartidas* bdp) {
+    limpar_tela();
     printf("\n--- Consultar Partidas ---\n");
     printf("1 - Por time mandante\n");
     printf("2 - Por time visitante\n");
@@ -239,7 +242,8 @@ void handle_consultar_partidas(BDTimes* bdt, BDPartidas* bdp) {
 }
 
 /* (6° opção do menu) Imprime a tabela de classificação completa, ordenada por ID. */
-void handle_imprimir_tabela(BDTimes* bdt) {
+void imprimir_tabela_classificacao(BDTimes* bdt) {
+    limpar_tela();
     int num_times = 0;
     Time** todos_times = get_todos_times_bd(bdt, &num_times);
 
